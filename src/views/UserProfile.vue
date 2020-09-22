@@ -2,7 +2,7 @@
   <div class="user-profile">
     <div class="user-profile__sidebar">
       <div class="user-profile__user-panel">
-        <h1 class="user-profile__user-name">{{ state.user.username }}</h1>
+        <h1 class="user-profile__user-name">@{{ state.user.username }}</h1>
         <div class="user-profile__admin-badge" v-if="state.user.isAdmin">
             Admin
         </div>
@@ -25,9 +25,11 @@
 
 <script>
 
-import TweetItem from './TweetItem';
-import CreateTweetPanel from './CreateTweetPanel';
-import { reactive } from 'vue';
+import TweetItem from '@/components/TweetItem';
+import CreateTweetPanel from '@/components/CreateTweetPanel';
+import { reactive, computed } from 'vue';
+import { useRoute } from 'vue-router';
+import { users } from '@/assets/users.js';
 
 export default {
     name: 'UserProfile',
@@ -36,21 +38,12 @@ export default {
       CreateTweetPanel
     },
     setup() {
+      const route = useRoute();
+      const userId = computed(() => route.params.userId);
+
       const state = reactive({
         followers: 0,
-        user: {
-          id: 1,
-          username: 'aborja',
-          firstName: 'Alfred',
-          lastName: 'Borja',
-          email: 'alfredoborja81194@gmail.com',
-          isAdmin: true,
-          tweets: [
-              { id: 1, content: 'Vue JS is amazing!' },
-              { id: 2, content: 'Don\'t forget to subscribe to Vue Mastery' },
-              { id: 3, content: 'Love web programming!' }
-          ]
-        },
+        user: users[userId.value - 1] || users[0]
       });
 
       function addTweet(tweet) {
@@ -62,7 +55,8 @@ export default {
 
       return {
         state,
-        addTweet
+        addTweet,
+        userId
       }
     },
   watch: {

@@ -6,25 +6,10 @@
           Twitter
         </div>
       </router-link>
-      <div class="navigation__user" >
-        @aborja
-      </div>
     </nav>
-    <UserProfile />
+    <router-view/>
   </div>
 </template>
-
-<script>
-
-import UserProfile from './components/UserProfile';
-
-export default {
-  name:'App',
-  components: {
-    UserProfile
-  }
-}
-</script>
 
 <style lang="scss">
 #app {
