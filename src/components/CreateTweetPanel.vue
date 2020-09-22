@@ -4,13 +4,13 @@
         <label for="newTweet">
         <strong>New Tweet</strong> {{ newTweetCharacterCount }}/180
         </label>
-        <textarea id="newTweet" rows="4" v-model="newTweetContent"/>
+        <textarea id="newTweet" rows="4" v-model="state.newTweetContent"/>
 
         <div class="create-tweet-panel__submit">
             <div class="create-tweet-type">
                 <label for="newTweetType"><strong>Type: </strong></label>
-                <select id="newTweetType" v-model="selectedTweetType">
-                    <option :value="option.value" v-for="(option, index) in tweetTypes" :key="index">{{ option.name }}</option>
+                <select id="newTweetType" v-model="state.selectedTweetType">
+                    <option :value="option.value" v-for="(option, index) in state.tweetTypes" :key="index">{{ option.name }}</option>
                 </select>
             </div>
             <button>Tweet!</button>
@@ -20,32 +20,37 @@
 </template>
 
 <script>
+
+import { reactive, computed } from 'vue';
+
 export default {
     name: 'CreateTweetPanel',
-    data() {
-        return {
-            tweetTypes: [
+    setup(props, context) {
+      const state = reactive({
+        tweetTypes: [
                 { value: 'draft', name: 'Draft' },
                 { value: 'instant', name: 'Instant Tweet' },
                 ],
             newTweetContent: '',
             selectedTweetType: 'instant'
-        }
-    },
-    computed: {
-        newTweetCharacterCount() {
-            return this.newTweetContent.length;
-        }
-    },
-    methods: {
-        createNewTweet() {
-            if (this.newTweetContent && this.selectedTweetType !== 'draft') {
-                this.$emit('add-tweet',  this.newTweetContent);
+      });
 
-                this.newTweetContent = '';
-                this.selectedTweetType = 'instant';
-            }
+      const newTweetCharacterCount = computed(() => state.newTweetContent.length);
+
+      function createNewTweet() {
+        if (state.newTweetContent && state.selectedTweetType !== 'draft') {
+          context.emit('add-tweet',  state.newTweetContent);
+
+          state.newTweetContent = '';
+          state.selectedTweetType = 'instant';
         }
+      }
+
+      return {
+        state,
+        newTweetCharacterCount,
+        createNewTweet
+      }
     }
 }
 </script>

@@ -2,20 +2,20 @@
   <div class="user-profile">
     <div class="user-profile__sidebar">
       <div class="user-profile__user-panel">
-        <h1 class="user-profile__user-name">{{ user.username }}</h1>
-        <div class="user-profile__admin-badge" v-if="user.isAdmin">
+        <h1 class="user-profile__user-name">{{ state.user.username }}</h1>
+        <div class="user-profile__admin-badge" v-if="state.user.isAdmin">
             Admin
         </div>
         <div class="user-profile__follower-count">
-            <strong>Followers</strong> {{ followers }}
+            <strong>Followers</strong> {{state.followers }}
         </div>
         <CreateTweetPanel @add-tweet="addTweet"/>
       </div>
     </div>
     <div class="user-profile__tweets-wrapper">
         <div class="user-profile__tweet" >
-            <TweetItem v-for="tweet in user.tweets" :key="tweet.id" 
-              :username="user.username" 
+            <TweetItem v-for="tweet in state.user.tweets" :key="tweet.id" 
+              :username="state.user.username" 
               :tweet="tweet" 
               @favorite="toggleFavorite"/>
         </div>
@@ -27,6 +27,7 @@
 
 import TweetItem from './TweetItem';
 import CreateTweetPanel from './CreateTweetPanel';
+import { reactive } from 'vue';
 
 export default {
     name: 'UserProfile',
@@ -34,45 +35,42 @@ export default {
       TweetItem,
       CreateTweetPanel
     },
-    data() {
-    return {
-      followers: 0,
-      user: {
-        id: 1,
-        username: 'aborja',
-        firstName: 'Alfred',
-        lastName: 'Borja',
-        email: 'alfredoborja81194@gmail.com',
-        isAdmin: true,
-        tweets: [
-            { id: 1, content: 'Vue JS is amazing!' },
-            { id: 2, content: 'Don\'t forget to subscribe to Vue Mastery' },
-            { id: 3, content: 'Love web programming!' }
-        ]
-      },
-    };
-  },
+    setup() {
+      const state = reactive({
+        followers: 0,
+        user: {
+          id: 1,
+          username: 'aborja',
+          firstName: 'Alfred',
+          lastName: 'Borja',
+          email: 'alfredoborja81194@gmail.com',
+          isAdmin: true,
+          tweets: [
+              { id: 1, content: 'Vue JS is amazing!' },
+              { id: 2, content: 'Don\'t forget to subscribe to Vue Mastery' },
+              { id: 3, content: 'Love web programming!' }
+          ]
+        },
+      });
+
+      function addTweet(tweet) {
+        state.user.tweets.unshift({
+          id: state.user.tweets.length + 1,
+          content: tweet
+        });
+      }
+
+      return {
+        state,
+        addTweet
+      }
+    },
   watch: {
     followers(newFollowerCount, oldFollowerCount) {
       if (oldFollowerCount < newFollowerCount) {
         console.log(`${this.user.username} has gained a follower!`);
       }
     }
-  },
-  
-  methods: {
-    followUser() {
-      this.followers++;
-    },
-    addTweet(tweet) {
-      this.user.tweets.unshift({
-        id: this.user.tweets.length + 1,
-        content: tweet
-      });
-    },
-  },
-  mounted() {
-    this.followUser();
   }
 }
 </script>
